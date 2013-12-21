@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using PortableRest;
 
 namespace Xbox.Music
@@ -17,8 +19,14 @@ namespace Xbox.Music
 
         #region Properties
 
+        /// <summary>
+        /// The Client ID assigned to you from your Azure Marketplace account.
+        /// </summary>
         public string ClientId { get; private set; }
 
+        /// <summary>
+        /// The Client Secret assigned to you from your Azure Marketplace account.
+        /// </summary>
         public string ClientSecret { get; private set; }
 
         /// <summary>
@@ -33,20 +41,25 @@ namespace Xbox.Music
         /// Responses will be filtered to provide only those that match the user's country/region.
         /// </summary>
         public string Country { get; set; }
-
-
+        
         /// <summary>
         /// Required. A valid developer authentication Access Token obtained from Azure Data Market, 
         /// used to identify the third-party application using the Xbox Music RESTful API.
         /// </summary>
         private string AccessToken { get; set; }
 
+        /// <summary>
+        /// Keeps track of when the token was last issued so the MusicClient can obtain a new one 
+        /// before it expires.
+        /// </summary>
+        private DateTime TokenLastAcquired { get; set; }
+
         #endregion
 
         #region Constructors
 
         /// <summary>
-        /// 
+        /// Creates a new instance of the MusicClient for a given ClientId and ClientSecret.
         /// </summary>
         /// <param name="clientId"></param>
         /// <param name="clientSecret"></param>
@@ -54,7 +67,7 @@ namespace Xbox.Music
         {
             ClientId = clientId;
             ClientSecret = clientSecret;
-
+            BaseUrl = "https://music.xboxlive.com";
 
             // PCL-friendly way to get current version
             var thisAssembly = typeof(Artist).GetTypeInfo().Assembly;
@@ -73,23 +86,24 @@ namespace Xbox.Music
         #region Public Methods
 
         /// <summary>
-        /// 
+        /// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier. 
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The ID to search for. Must start with "music."</param>
+        /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
         public async Task<ContentResponse> Get(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentNullException("id", "You must specify an ID");
 
-            if (string.IsNullOrWhiteSpace(AccessToken))
+            if (string.IsNullOrWhiteSpace(AccessToken) || TokenLastAcquired.AddMinutes(9) >= DateTime.Now)
             {
                 Debug.WriteLine("Obtaining an AccessToken...");
                 await Authenticate();
             }
 
-            var request = GetPopulatedRequest("/1/content/{id}/lookup");
+            var request = GetPopulatedRequest("1/content/{id}/lookup");
             request.AddUrlSegment("id", id);
+            request.AddQueryString("accessToken", "Bearer " + AccessToken);
             
             return await ExecuteAsync<ContentResponse>(request);
         }
@@ -99,20 +113,20 @@ namespace Xbox.Music
         /// </summary>
         /// <param name="query"></param>
         /// <param name="maxItems"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown if you try to ask for more than 25 items.</exception>
         public async Task<ContentResponse> Find(string query, int maxItems = 10)
         {
             if (maxItems > 25)
                 throw new ArgumentOutOfRangeException("maxItems", "Value cannot be greater than 25.");
 
-            if (string.IsNullOrWhiteSpace(AccessToken))
+            if (string.IsNullOrWhiteSpace(AccessToken) || TokenLastAcquired.AddMinutes(9) >= DateTime.Now)
             {
                 Debug.WriteLine("Obtaining an AccessToken...");
                 await Authenticate();
             }
 
-            var request = GetPopulatedRequest("/1/content/{namespace}/search");
+            var request = GetPopulatedRequest("1/content/{namespace}/search");
 
             request.AddQueryString("q", query);
 
@@ -120,7 +134,8 @@ namespace Xbox.Music
             {
                 request.AddQueryString("maxItems", maxItems);
             }
-
+            request.AddQueryString("accessToken", "Bearer " + AccessToken);
+            
             return await ExecuteAsync<ContentResponse>(request);
         }
 
@@ -128,6 +143,11 @@ namespace Xbox.Music
 
         #region Private Methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="resourceUrl"></param>
+        /// <returns></returns>
         private RestRequest GetPopulatedRequest(string resourceUrl)
         {
             if (string.IsNullOrWhiteSpace(AccessToken))
@@ -135,7 +155,7 @@ namespace Xbox.Music
                 throw new Exception("The Xbox Music Client was unable to obtain an AccessToken from the authentication service.");
             }
 
-            var request = new RestRequest(resourceUrl);
+            var request = new RestRequest(resourceUrl) { ContentType = ContentTypes.Json };
 
             request.AddUrlSegment("namespace", "music");
 
@@ -147,9 +167,7 @@ namespace Xbox.Music
             {
                 request.AddQueryString("country", Country);
             }
-
-            request.AddQueryString("accessToken", AccessToken);
-            
+           
             return request;
         }
 
@@ -166,7 +184,8 @@ namespace Xbox.Music
             };
             var request = new RestRequest("v2/OAuth2-13", HttpMethod.Post)
             {
-                ContentType = ContentTypes.FormUrlEncoded
+                ContentType = ContentTypes.FormUrlEncoded,
+                ReturnRawString = true,
             };
             request.AddParameter("client_id", ClientId);
             request.AddParameter("client_secret", ClientSecret);
@@ -174,7 +193,10 @@ namespace Xbox.Music
             request.AddParameter("grant_type", "client_credentials");
 
             var result = await client.ExecuteAsync<string>(request);
-            AccessToken = Regex.Match(result, ".*\"access_token\":\"(.*?)\".*", RegexOptions.IgnoreCase).Groups[1].Value;
+
+            var token = Regex.Match(result, ".*\"access_token\":\"(.*?)\".*", RegexOptions.IgnoreCase).Groups[1].Value;
+            AccessToken = token;
+            TokenLastAcquired = DateTime.Now;
         }
 
         #endregion

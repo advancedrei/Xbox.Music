@@ -71,7 +71,7 @@ namespace Xbox.Music
         public string GetImage(int width, int height, ImageResizeMode mode = ImageResizeMode.Crop, string backgroundColor = "")
         {
             var modeString = Enum.GetName(typeof (ImageResizeMode), mode).ToLower();
-            return string.Format("{0}&w={2}&h={3}&mode={4}&background={5}", ImageUrl, width, height, modeString, backgroundColor);
+            return string.Format("{0}&w={1}&h={2}&mode={3}&background={4}", ImageUrl, width, height, modeString, backgroundColor);
         }
 
         /// <summary>

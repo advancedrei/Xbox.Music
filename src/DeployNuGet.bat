@@ -1,0 +1,1 @@
+".nuget/nuget.exe" pack Xbox.Music.nuspec -symbols

@@ -1,7 +1,7 @@
 [Xbox.Music](http://github.com/AdvancedREI/Xbox.Music)
 =================
 
-Xbox.Music is a Portable Class Library that makes it easy to interact with the new Xbox Music API.
+Xbox.Music is a Portable Class Library that makes it easy to interact with the new Xbox Music API. It handles all of the nuances of the API for you, like automatically renewing your token every 10 minutes and building DeepLinks that launch the official Xbox Music client when clicked, so you can just focus on building epic experiences.
 
 Works on .NET 4.5, Windows Phone 8, and Windows 8.x, as well as Android and iOS through Mono.
 
@@ -19,10 +19,21 @@ Here is a simple example of leveraging the MusicClient to query an Artist.
 // Take advantage of built-in Point of Interest groups
 var client = new MusicClient("YOUR CLIENT ID", "YOUR CLIENT SECRET");
 
-// The MusicClient handles OAuth authentication internally, no need to worry about the methodology in the official docs.
+// The MusicClient handles OAuth authentication internally, no need to worry about
+// the token management methodology in the official docs, like renewing your token
+// every 10 minutes.
 var results = await client.Find("Daft Punk")
 
 Debug.WriteLine(results.Artists.Items.Count);
+```
+There are also helper methods for getting Images, DeepLinks, and Affiliate links for the objects returned from the service. For example:
+
+```csharp
+var artist = results.Artists.Items.First();
+
+var imageUrl = artist.GetImage(200, 200, ImageResizeMode.Letterbox);
+
+var affiliateLink = artist.GetDeepLink("YOUR AFFILIATE ID", LinkAction.Buy);
 ```
 
 For more information, check out our [online documentation at NuDoq](http://www.nudoq.org/#!/Projects/Xbox.Music).
