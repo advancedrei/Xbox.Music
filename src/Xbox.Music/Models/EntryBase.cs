@@ -66,12 +66,15 @@ namespace Xbox.Music
         /// <param name="width">Image width in pixels.</param>
         /// <param name="height">Image height in pixels.</param>
         /// <param name="mode">The mode with wich to resize the image.</param>
-        /// <param name="backgroundColor">HTML-compliant color for letterbox resize mode background. Defaults to an empty string.</param>
-        /// <returns></returns>
+        /// <param name="backgroundColor">
+        /// HTML-compliant color for letterbox resize mode background. Hex values must start with a #. 
+        /// Can also use color names, such as "green". Defaults to an empty string.
+        /// </param>
+        /// <returns>A string with the URL for the requested image specifications.</returns>
         public string GetImage(int width, int height, ImageResizeMode mode = ImageResizeMode.Crop, string backgroundColor = "")
         {
             var modeString = Enum.GetName(typeof (ImageResizeMode), mode).ToLower();
-            return string.Format("{0}&w={1}&h={2}&mode={3}&background={4}", ImageUrl, width, height, modeString, backgroundColor);
+            return string.Format("{0}&w={1}&h={2}&mode={3}&background={4}", ImageUrl, width, height, modeString, backgroundColor.Replace("#", "%23"));
         }
 
         /// <summary>
