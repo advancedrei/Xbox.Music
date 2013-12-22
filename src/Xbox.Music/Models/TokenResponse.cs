@@ -11,6 +11,9 @@ namespace Xbox.Music
     [DataContract]
     internal class TokenResponse
     {
+
+        #region Properties
+
         /// <summary>
         /// The access token that you can use to authenticate you access to the Xbox Music RESTful API.
         /// </summary>
@@ -34,6 +37,31 @@ namespace Xbox.Music
         /// </summary>
         [DataMember(Name = "scope")]
         internal string Scope { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal DateTime TimeStamp { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal bool IsValid
+        {
+            get { return TimeStamp.AddSeconds(ExpiresInSeconds - 5) < DateTime.Now; }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        internal bool NeedsRefresh
+        {
+            get { return TimeStamp.AddSeconds(ExpiresInSeconds - 30) < DateTime.Now; }
+        }
+
+        #endregion
+
+
 
     }
 }

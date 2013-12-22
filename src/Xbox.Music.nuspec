@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>Xbox.Music</id>
-        <version>1.0-Beta2</version>
+        <version>1.0-Beta2a</version>
         <title>Xbox Music</title>
         <authors>AdvancedREI</authors>
         <owners>AdvancedREI</owners>
@@ -10,6 +10,8 @@
         <projectUrl>http://github.com/AdvancedREI/Xbox.Music</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>A Portable Class Library implementation of the Xbox Music API, powered by PortableRest. (.NET 4.5, Windows Phone 8, and Windows 8.x)</description>
+        <releaseNotes>Beta 2a: Bug fix in EntityBase.GetImage().
+Beta 2: First working release.</releaseNotes>
         <copyright>Copyright © 2013-2014 AdvancedREI, LLC.</copyright>
         <tags>PortableRest, Xbox, Xbox Music, Windows Phone, PCL</tags>
         <dependencies>
@@ -20,6 +22,18 @@
         <file src="Xbox.Music\bin\Release\Xbox.Music.dll" target="lib\portable-net45+wp8+win8\Xbox.Music.dll" />
         <file src="Xbox.Music\bin\Release\Xbox.Music.pdb" target="lib\portable-net45+wp8+win8\Xbox.Music.pdb" />
         <file src="Xbox.Music\bin\Release\Xbox.Music.xml" target="lib\portable-net45+wp8+win8\Xbox.Music.xml" />
-        <file src="Xbox.Music\**\*.cs" exclude="**\obj\**\*.*" target="src" />
+        <file src="Xbox.Music\Models\Album.cs" target="src\Models\Album.cs" />
+        <file src="Xbox.Music\Models\Artist.cs" target="src\Models\Artist.cs" />
+        <file src="Xbox.Music\Models\ContentResponse.cs" target="src\Models\ContentResponse.cs" />
+        <file src="Xbox.Music\Models\Contributor.cs" target="src\Models\Contributor.cs" />
+        <file src="Xbox.Music\Models\EntryBase.cs" target="src\Models\EntryBase.cs" />
+        <file src="Xbox.Music\Models\Error.cs" target="src\Models\Error.cs" />
+        <file src="Xbox.Music\Models\ImageResizeMode.cs" target="src\Models\ImageResizeMode.cs" />
+        <file src="Xbox.Music\Models\LinkAction.cs" target="src\Models\LinkAction.cs" />
+        <file src="Xbox.Music\Models\PaginatedList.cs" target="src\Models\PaginatedList.cs" />
+        <file src="Xbox.Music\Models\TokenResponse.cs" target="src\Models\TokenResponse.cs" />
+        <file src="Xbox.Music\Models\Track.cs" target="src\Models\Track.cs" />
+        <file src="Xbox.Music\Properties\AssemblyInfo.cs" target="src\Properties\AssemblyInfo.cs" />
+        <file src="Xbox.Music\MusicClient.cs" target="src\MusicClient.cs" />
     </files>
 </package>

@@ -73,31 +73,41 @@ namespace Xbox.Music
         /// <returns>A string with the URL for the requested image specifications.</returns>
         public string GetImage(int width, int height, ImageResizeMode mode = ImageResizeMode.Crop, string backgroundColor = "")
         {
-            var modeString = Enum.GetName(typeof (ImageResizeMode), mode).ToLower();
-            return string.Format("{0}&w={1}&h={2}&mode={3}&background={4}", ImageUrl, width, height, modeString, backgroundColor.Replace("#", "%23"));
+            var modeString = Enum.GetName(typeof(ImageResizeMode), mode).ToLower();
+            switch (mode)
+            {
+                case ImageResizeMode.Letterbox:
+                    return string.Format("{0}&w={1}&h={2}&mode={3}&background={4}", ImageUrl, width, height, modeString, backgroundColor.Replace("#", "%23"));
+                case ImageResizeMode.Scale:
+                    return string.Format("{0}&w={1}&h={2}&mode={3}", ImageUrl, width, height, modeString);
+                default:
+                    return string.Format("{0}&w={1}&h={2}", ImageUrl, width, height);
+            }
+
         }
 
         /// <summary>
-        /// 
+        /// Creates a link that opens the platform's Xbox Music app with the specified view.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="action"></param>
+        /// <param name="action">The view to open for this particular entity.</param>
         /// <returns></returns>
-        internal string GetDeepLinkInternal(string entity, LinkAction action = LinkAction.View)
+        public string GetDeepLink(LinkAction action = LinkAction.View)
         {
             var actionString = Enum.GetName(typeof(LinkAction), action).ToLower();
-            return string.Format("http://music.xbox.com/{0}/{1}?action={2}", entity, Id.Replace("music.", ""), actionString);
+            var format = Link.Contains("?") ? "{0}?action={1}" : "{0}&action={1}";
+            return string.Format(format, Link, actionString);
+
         }
 
         /// <summary>
-        /// 
+        /// Creates an Affiliate link that opens the platform's Xbox Music app with the specified view.
         /// </summary>
-        /// <param name="affiliateId"></param>
-        /// <param name="unescapedDeepLink"></param>
+        /// <param name="affiliateId">The AffiliateID assigned to you by LinkSynergy.</param>
+        /// <param name="action">The view to open for this particular entity.</param>
         /// <returns></returns>
-        internal string GetDeepLinkInternal(string affiliateId, string unescapedDeepLink)
+        public string GetDeepLink(string affiliateId, LinkAction action = LinkAction.View)
         {
-            var deepLink = Uri.EscapeUriString(unescapedDeepLink);
+            var deepLink = Uri.EscapeUriString(GetDeepLink(action));
             return string.Format("http://click.linksynergy.com/deeplink?id={0}&mid=39033&murl={1}", affiliateId, deepLink);
         }
 

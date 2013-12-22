@@ -72,26 +72,7 @@ namespace Xbox.Music
 
         #region Public Methods
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public string GetDeepLink(LinkAction action = LinkAction.View)
-        {
-            return base.GetDeepLinkInternal("Album", action);
-        }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="affiliateId"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public string GetDeepLink(string affiliateId, LinkAction action = LinkAction.View)
-        {
-            return GetDeepLinkInternal(affiliateId, GetDeepLink(action));
-        }
 
         #endregion
 

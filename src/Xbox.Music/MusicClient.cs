@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using PortableRest;
 
 namespace Xbox.Music
@@ -46,13 +46,18 @@ namespace Xbox.Music
         /// Required. A valid developer authentication Access Token obtained from Azure Data Market, 
         /// used to identify the third-party application using the Xbox Music RESTful API.
         /// </summary>
-        private string AccessToken { get; set; }
+        //private string AccessToken { get; set; }
 
         /// <summary>
         /// Keeps track of when the token was last issued so the MusicClient can obtain a new one 
         /// before it expires.
         /// </summary>
-        private DateTime TokenLastAcquired { get; set; }
+        //private DateTime TokenLastAcquired { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private TokenResponse TokenResponse { get; set; }
 
         #endregion
 
@@ -95,15 +100,11 @@ namespace Xbox.Music
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentNullException("id", "You must specify an ID");
 
-            if (string.IsNullOrWhiteSpace(AccessToken) || TokenLastAcquired.AddMinutes(9) >= DateTime.Now)
-            {
-                Debug.WriteLine("Obtaining an AccessToken...");
-                await Authenticate();
-            }
+            await CheckToken();
 
             var request = GetPopulatedRequest("1/content/{id}/lookup");
             request.AddUrlSegment("id", id);
-            request.AddQueryString("accessToken", "Bearer " + AccessToken);
+            request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
             
             return await ExecuteAsync<ContentResponse>(request);
         }
@@ -115,27 +116,35 @@ namespace Xbox.Music
         /// <param name="maxItems"></param>
         /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
         /// <exception cref="ArgumentOutOfRangeException">This exception is thrown if you try to ask for more than 25 items.</exception>
-        public async Task<ContentResponse> Find(string query, int maxItems = 10)
+        public async Task<ContentResponse> Find(string query, int maxItems = 25, bool getArtists = true, bool getAlbums = true, bool getTracks = true)
         {
             if (maxItems > 25)
                 throw new ArgumentOutOfRangeException("maxItems", "Value cannot be greater than 25.");
 
-            if (string.IsNullOrWhiteSpace(AccessToken) || TokenLastAcquired.AddMinutes(9) >= DateTime.Now)
-            {
-                Debug.WriteLine("Obtaining an AccessToken...");
-                await Authenticate();
-            }
+            await CheckToken();
 
             var request = GetPopulatedRequest("1/content/{namespace}/search");
 
             request.AddQueryString("q", query);
 
-            if (maxItems != 10)
+            if (maxItems != 25)
             {
                 request.AddQueryString("maxItems", maxItems);
             }
-            request.AddQueryString("accessToken", "Bearer " + AccessToken);
-            
+
+            if (!(getArtists && getAlbums && getTracks))
+            {
+                var filter = new List<string>();
+
+                if (getArtists) filter.Add("artists");
+                if (getAlbums) filter.Add("albums");
+                if (getTracks) filter.Add("tracks");
+
+                request.AddQueryString("filter", filter.Aggregate("", (c, n) => c.Length == 0 ? c += n : c += "+" + n));
+            }
+
+            request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
+
             return await ExecuteAsync<ContentResponse>(request);
         }
 
@@ -150,7 +159,7 @@ namespace Xbox.Music
         /// <returns></returns>
         private RestRequest GetPopulatedRequest(string resourceUrl)
         {
-            if (string.IsNullOrWhiteSpace(AccessToken))
+            if (string.IsNullOrWhiteSpace(TokenResponse.AccessToken))
             {
                 throw new Exception("The Xbox Music Client was unable to obtain an AccessToken from the authentication service.");
             }
@@ -169,6 +178,31 @@ namespace Xbox.Music
             }
            
             return request;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private async Task CheckToken()
+        {
+            if (TokenResponse != null && TokenResponse.NeedsRefresh)
+            {
+                // RWM: The token is still valid but within the 30 refresh window. 
+                // Get a new token, but to not block the existing request.
+                Debug.WriteLine("Proactively refreshing the AccessToken...");
+                // ReSharper disable once CSharpWaawesonmernings::CS4014
+                Authenticate();
+            }
+
+            if (TokenResponse == null || !TokenResponse.IsValid)
+            {
+                // RWM: The token is invalid or outside the refresh window. 
+                // Get a new token, blocking the waiting request until the token has been acquired.
+                Debug.WriteLine("Obtaining an AccessToken...");
+                await Authenticate();
+            }
+
         }
 
         /// <summary>
@@ -194,9 +228,15 @@ namespace Xbox.Music
 
             var result = await client.ExecuteAsync<string>(request);
 
-            var token = Regex.Match(result, ".*\"access_token\":\"(.*?)\".*", RegexOptions.IgnoreCase).Groups[1].Value;
-            AccessToken = token;
-            TokenLastAcquired = DateTime.Now;
+            TokenResponse = JsonConvert.DeserializeObject<TokenResponse>(result);
+            if (TokenResponse != null)
+            {
+                TokenResponse.TimeStamp = DateTime.Now;
+            }
+
+            //var token = Regex.Match(result, ".*\"access_token\":\"(.*?)\".*", RegexOptions.IgnoreCase).Groups[1].Value;
+            //AccessToken = token;
+            //TokenLastAcquired = DateTime.Now;
         }
 
         #endregion

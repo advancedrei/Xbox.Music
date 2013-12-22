@@ -24,6 +24,22 @@ namespace Xbox.Music.Tests
             Assert.IsNotNull(result.Albums);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task FindTest2()
+        {
+            var client = new MusicClient("XboxMusicClientTests", "ThisWillBeChangedOften");
+            var result = await client.Find("Daft Punk", getAlbums: false);
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.Error);
+            Assert.IsNotNull(result.Artists);
+            Assert.IsNotNull(result.Tracks);
+            //Assert.IsNull(result.Albums);
+        }
+
         [TestMethod]
         public async Task GetTest1()
         {
