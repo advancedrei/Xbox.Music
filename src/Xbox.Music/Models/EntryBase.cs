@@ -94,7 +94,7 @@ namespace Xbox.Music
         public string GetDeepLink(LinkAction action = LinkAction.View)
         {
             var actionString = Enum.GetName(typeof(LinkAction), action).ToLower();
-            var format = Link.Contains("?") ? "{0}?action={1}" : "{0}&action={1}";
+            var format = Link.Contains("?") ? "{0}&action={1}" : "{0}?action={1}";
             return string.Format(format, Link, actionString);
 
         }
