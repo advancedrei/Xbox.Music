@@ -12,6 +12,10 @@ namespace Xbox.Music.Tests
     [TestClass]
     public class MusicClientTests
     {
+
+        private static string _find1ContinuationToken = "";
+        private static string _get1ContinuationToken = "";
+
         [TestMethod]
         public async Task FindTest1()
         {
@@ -19,9 +23,23 @@ namespace Xbox.Music.Tests
             var result = await client.Find("Daft Punk");
             Assert.IsNotNull(result);
             Assert.IsNull(result.Error);
+            Assert.IsNotNull(result.Albums);
             Assert.IsNotNull(result.Artists);
             Assert.IsNotNull(result.Tracks);
+            
+            _find1ContinuationToken = result.Albums.ContinuationToken;
+        }
+
+        [TestMethod]
+        public async Task FindTest1Continued()
+        {
+            var client = new MusicClient("XboxMusicClientTests", "ThisWillBeChangedOften");
+            var result = await client.Find("Daft Punk", _find1ContinuationToken);
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.Error);
             Assert.IsNotNull(result.Albums);
+            Assert.IsNull(result.Artists);
+            Assert.IsNull(result.Tracks);
         }
 
         /// <summary>
@@ -51,6 +69,18 @@ namespace Xbox.Music.Tests
             //Assert.IsNotNull(result.Tracks);
             //Assert.IsNotNull(result.Albums);
         }
+
+        //[TestMethod]
+        //public async Task GetTest1Continued()
+        //{
+        //    var client = new MusicClient("XboxMusicClientTests", "ThisWillBeChangedOften");
+        //    var result = await client.Get("music.C61C0000-0200-11DB-89CA-0019B92A3933");
+        //    Assert.IsNotNull(result);
+        //    Assert.IsNull(result.Error);
+        //    Assert.IsNotNull(result.Artists);
+        //    //Assert.IsNotNull(result.Tracks);
+        //    //Assert.IsNotNull(result.Albums);
+        //}
 
 
         [TestMethod]

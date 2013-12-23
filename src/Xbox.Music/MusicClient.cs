@@ -91,33 +91,20 @@ namespace Xbox.Music
         #region Public Methods
 
         /// <summary>
-        /// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier. 
+        /// Allows you to find a <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a string query.
         /// </summary>
-        /// <param name="id">The ID to search for. Must start with "music."</param>
-        /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
-        public async Task<ContentResponse> Get(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-                throw new ArgumentNullException("id", "You must specify an ID");
-
-            await CheckToken();
-
-            var request = GetPopulatedRequest("1/content/{id}/lookup");
-            request.AddUrlSegment("id", id);
-            request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
-            
-            return await ExecuteAsync<ContentResponse>(request);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="maxItems"></param>
+        /// <param name="query">The term to search for.</param>
+        /// <param name="maxItems">The maximum number of results per page to return.</param>
+        /// <param name="getArtists">Specifies whether or not to include <see cref="Artist">Artists</see> in the results. Defaults to true.</param>
+        /// <param name="getAlbums">Specifies whether or not to include <see cref="Album">Albums</see> in the results. Defaults to true.</param>
+        /// <param name="getTracks">Specifies whether or not to include <see cref="Track">Tracks</see> in the results. Defaults to true.</param>
         /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
         /// <exception cref="ArgumentOutOfRangeException">This exception is thrown if you try to ask for more than 25 items.</exception>
         public async Task<ContentResponse> Find(string query, int maxItems = 25, bool getArtists = true, bool getAlbums = true, bool getTracks = true)
         {
+            if (string.IsNullOrWhiteSpace(query))
+                throw new ArgumentNullException("query", "You must specify something to search for.");
+
             if (maxItems > 25)
                 throw new ArgumentOutOfRangeException("maxItems", "Value cannot be greater than 25.");
 
@@ -148,6 +135,72 @@ namespace Xbox.Music
             return await ExecuteAsync<ContentResponse>(request);
         }
 
+        /// <summary>
+        /// Allows you to continue a previous search request.
+        /// </summary>
+        /// <param name="query">The term to search for.</param>
+        /// <param name="continuationToken"></param>
+        /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown if you try to ask for more than 25 items.</exception>
+        public async Task<ContentResponse> Find(string query, string continuationToken)
+        {
+            if (string.IsNullOrWhiteSpace(continuationToken))
+                throw new ArgumentNullException("continuationToken", "You must specify the continuationToken from a previous query.");
+
+            await CheckToken();
+
+            var request = GetPopulatedRequest("1/content/{namespace}/search");
+
+            request.AddQueryString("continuationToken", continuationToken);
+            request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
+
+            return await ExecuteAsync<ContentResponse>(request);
+        }
+        
+        /// <summary>
+        /// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier. 
+        /// </summary>
+        /// <param name="id">The ID to search for. Must start with "music."</param>
+        /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
+        public async Task<ContentResponse> Get(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new ArgumentNullException("id", "You must specify an ID");
+
+            await CheckToken();
+
+            var request = GetPopulatedRequest("1/content/{id}/lookup");
+            request.AddUrlSegment("id", id);
+            request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
+            
+            return await ExecuteAsync<ContentResponse>(request);
+        }
+
+        ///// <summary>
+        ///// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier, 
+        ///// and the ContinuationToken from a previous request.
+        ///// </summary>
+        ///// <param name="id">The ID to search for. Must start with "music."</param>
+        ///// <param name="continuationToken">The PaginatedList.ContinuationToken from a previous request.</param>
+        ///// <returns></returns>
+        //public async Task<ContentResponse> Get(string id, string continuationToken)
+        //{
+        //    if (string.IsNullOrWhiteSpace(id))
+        //        throw new ArgumentNullException("id", "You must specify an ID");
+
+        //    if (string.IsNullOrWhiteSpace(continuationToken))
+        //        throw new ArgumentNullException("continuationToken", "You must specify the continuationToken from a previous query.");
+
+        //    await CheckToken();
+
+        //    var request = GetPopulatedRequest("1/content/{id}/lookup");
+        //    request.AddUrlSegment("id", id);
+        //    request.AddQueryString("continuationToken", continuationToken);
+        //    request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
+
+        //    return await ExecuteAsync<ContentResponse>(request);
+        //}
+        
         #endregion
 
         #region Private Methods
