@@ -37,7 +37,7 @@ namespace Xbox.Music.Tests
             Assert.IsNull(result.Error);
             Assert.IsNotNull(result.Artists);
             Assert.IsNotNull(result.Tracks);
-            //Assert.IsNull(result.Albums);
+            Assert.IsNull(result.Albums);
         }
 
         [TestMethod]

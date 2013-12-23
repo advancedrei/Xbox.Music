@@ -140,7 +140,7 @@ namespace Xbox.Music
                 if (getAlbums) filter.Add("albums");
                 if (getTracks) filter.Add("tracks");
 
-                request.AddQueryString("filter", filter.Aggregate("", (c, n) => c.Length == 0 ? c += n : c += "+" + n));
+                request.AddQueryString("filters", filter.Aggregate("", (c, n) => c.Length == 0 ? c += n : c += "+" + n));
             }
 
             request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
