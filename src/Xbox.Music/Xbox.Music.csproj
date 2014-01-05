@@ -43,6 +43,7 @@
     <Compile Include="Models\EntryBase.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\ImageResizeMode.cs" />
+    <Compile Include="Models\LookupOptions.cs" />
     <Compile Include="Models\TokenResponse.cs" />
     <Compile Include="Models\LinkAction.cs" />
     <Compile Include="MusicClient.cs" />
@@ -62,7 +63,7 @@
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net45+wp80+win8\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PortableRest">
-      <HintPath>..\packages\PortableRest.2.2.3-alpha2\lib\portable-net45+sl5+wp8+win8\PortableRest.dll</HintPath>
+      <HintPath>..\packages\PortableRest.2.4.0\lib\portable-net45+sl5+wp8+win8\PortableRest.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.18\lib\portable-net40+sl4+win8+wp71\System.Net.Http.dll</HintPath>

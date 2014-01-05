@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("XboxMusic.RestClient")]
+[assembly: AssemblyTitle("Xbox Music API Portable Client")]
 [assembly: AssemblyDescription("A Portable Class Library for accessing Xbox Music REST APIs.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]

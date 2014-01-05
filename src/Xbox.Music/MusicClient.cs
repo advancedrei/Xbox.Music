@@ -73,22 +73,13 @@ namespace Xbox.Music
             ClientId = clientId;
             ClientSecret = clientSecret;
             BaseUrl = "https://music.xboxlive.com";
-
-            // PCL-friendly way to get current version
-            var thisAssembly = typeof(Artist).GetTypeInfo().Assembly;
-            var thisAssemblyName = new AssemblyName(thisAssembly.FullName);
-            var thisVersion = thisAssemblyName.Version;
-
-            var prAssembly = typeof(RestRequest).GetTypeInfo().Assembly;
-            var prAssemblyName = new AssemblyName(prAssembly.FullName);
-            var prVersion = prAssemblyName.Version;
-
-            UserAgent = string.Format("Xbox Music Portable Client {0} (PortableRest {1})", thisVersion, prVersion);
         }
 
         #endregion
 
         #region Public Methods
+
+        #region Find
 
         /// <summary>
         /// Allows you to find a <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a string query.
@@ -156,60 +147,134 @@ namespace Xbox.Music
 
             return await ExecuteAsync<ContentResponse>(request);
         }
-        
+
+        #endregion
+
+        #region Get
+
         /// <summary>
         /// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier. 
         /// </summary>
         /// <param name="id">The ID to search for. Must start with "music."</param>
+        /// <param name="options"></param>
         /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
-        public async Task<ContentResponse> Get(string id)
+        public async Task<ContentResponse> Get(string id, LookupOptions options = null)
         {
             if (string.IsNullOrWhiteSpace(id))
                 throw new ArgumentNullException("id", "You must specify an ID");
 
+            return await Get(new List<string> {id}, options);
+        }
+
+        /// <summary>
+        /// Allows you to get multiple <see cref="Artist">Artists</see>/<see cref="Album">Albums</see>/<see cref="Track">Tracks</see> by known identifiers. 
+        /// </summary>
+        /// <param name="ids">A List of IDs to search for. Must start with "music."</param>
+        /// <param name="options">Optional. A <see cref="LookupOptions"/> instance with details on what additional information should be returned.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        /// <returns>A <see cref="ContentResponse"/> object populated with results from the Xbox Music service.</returns>
+        public async Task<ContentResponse> Get(List<string> ids, LookupOptions options = null)
+        {
+            if (ids == null)
+                throw new ArgumentNullException("ids", "You must pass in a list of IDs to lookup.");
+
+            if (ids.Count == 0)
+                throw new ArgumentOutOfRangeException("ids", "The list of IDs to lookup cannot be empty.");
+
             await CheckToken();
 
-            var request = GetPopulatedRequest("1/content/{id}/lookup");
-            request.AddUrlSegment("id", id);
+            var request = GetPopulatedRequest("1/content/{ids}/lookup");
+            request.AddUrlSegment("ids", ids.Aggregate("", (c, n) => c.Length == 0 ? c += n : c += "+" + n));
+
+            if (options != null)
+            {
+                var extras = new List<string>();
+                if (options.GetArtistAlbums)
+                {
+                    extras.Add("albums");
+                }
+                if (options.GetArtistTopTracks)
+                {
+                    extras.Add("topTracks");
+                }
+                if (options.GetAlbumTracks)
+                {
+                    extras.Add("tracks");
+                }
+                if (options.GetAlbumArtistDetails || options.GetTrackArtistDetails)
+                {
+                    extras.Add("artistDetails");
+                }
+                if (options.GetTrackAlbumDetails)
+                {
+                    extras.Add("albumDetails");
+                }
+                request.AddQueryString("extras", extras.Aggregate("", (c, n) => c.Length == 0 ? c += n : c += "+" + n));
+            }
+
             request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
             
             return await ExecuteAsync<ContentResponse>(request);
         }
 
-        ///// <summary>
-        ///// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier, 
-        ///// and the ContinuationToken from a previous request.
-        ///// </summary>
-        ///// <param name="id">The ID to search for. Must start with "music."</param>
-        ///// <param name="continuationToken">The PaginatedList.ContinuationToken from a previous request.</param>
-        ///// <returns></returns>
-        //public async Task<ContentResponse> Get(string id, string continuationToken)
-        //{
-        //    if (string.IsNullOrWhiteSpace(id))
-        //        throw new ArgumentNullException("id", "You must specify an ID");
+        /// <summary>
+        /// Allows you to get an <see cref="Artist"/>/<see cref="Album"/>/<see cref="Track"/> by a known identifier, 
+        /// and the ContinuationToken from a previous request.
+        /// </summary>
+        /// <param name="id">The ID to search for. Must start with "music."</param>
+        /// <param name="continuationToken"></param>
+        /// <returns></returns>
+        public async Task<ContentResponse> Get(string id, string continuationToken)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                throw new ArgumentNullException("id", "You must specify an ID");
 
-        //    if (string.IsNullOrWhiteSpace(continuationToken))
-        //        throw new ArgumentNullException("continuationToken", "You must specify the continuationToken from a previous query.");
+            if (string.IsNullOrWhiteSpace(continuationToken))
+                throw new ArgumentNullException("continuationToken", "You must specify the continuationToken from a previous query.");
 
-        //    await CheckToken();
+            return await Get(new List<string> { id }, continuationToken);
+        }
 
-        //    var request = GetPopulatedRequest("1/content/{id}/lookup");
-        //    request.AddUrlSegment("id", id);
-        //    request.AddQueryString("continuationToken", continuationToken);
-        //    request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
+        /// <summary>
+        /// Allows you to get multiple <see cref="Artist">Artists</see>/<see cref="Album">Albums</see>/<see cref="Track">Tracks</see> by known identifiers,
+        /// and the ContinuationToken from a previous request.
+        /// </summary>
+        /// <param name="ids">A List of IDs to search for. Must start with "music."</param>
+        /// <param name="continuationToken">The PaginatedList.ContinuationToken from a previous request.</param>
+        /// <returns></returns>
+        public async Task<ContentResponse> Get(List<string> ids, string continuationToken)
+        {
+            if (ids == null)
+                throw new ArgumentNullException("ids", "You must pass in a list of IDs to lookup.");
 
-        //    return await ExecuteAsync<ContentResponse>(request);
-        //}
-        
+            if (ids.Count == 0)
+                throw new ArgumentOutOfRangeException("ids", "The list of IDs to lookup cannot be empty.");
+
+            if (string.IsNullOrWhiteSpace(continuationToken))
+                throw new ArgumentNullException("continuationToken", "You must specify the continuationToken from a previous query.");
+
+            await CheckToken();
+
+            var request = GetPopulatedRequest("1/content/{ids}/lookup");
+            request.AddUrlSegment("ids", ids.Aggregate("", (c, n) => c.Length == 0 ? c += n : c += "+" + n));
+            request.AddQueryString("continuationToken", continuationToken);
+            request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
+
+            return await ExecuteAsync<ContentResponse>(request);
+        }
+
+        #endregion
+
         #endregion
 
         #region Private Methods
 
         /// <summary>
-        /// 
+        /// Gets a new <see cref="RestRequest"/> populated with the common values for every request.
         /// </summary>
         /// <param name="resourceUrl"></param>
-        /// <returns></returns>
+        /// <returns>A new <see cref="RestRequest"/> populated with the common values for every request</returns>
         private RestRequest GetPopulatedRequest(string resourceUrl)
         {
             if (string.IsNullOrWhiteSpace(TokenResponse.AccessToken))
@@ -234,7 +299,9 @@ namespace Xbox.Music
         }
 
         /// <summary>
-        /// 
+        /// Checks to see if the token needs to be acquired or refreshed. If the Token is null or invalid, 
+        /// it will block the calling method until the Token request completes. Otherwise it will be considered
+        /// a proactive refresh and get an updated token in the background.
         /// </summary>
         /// <returns></returns>
         private async Task CheckToken()
@@ -244,7 +311,7 @@ namespace Xbox.Music
                 // RWM: The token is still valid but within the 30 refresh window. 
                 // Get a new token, but to not block the existing request.
                 Debug.WriteLine("Proactively refreshing the AccessToken...");
-                // ReSharper disable once CSharpWaawesonmernings::CS4014
+// ReSharper disable once CSharpWarnings::CS4014
                 Authenticate();
             }
 
@@ -259,7 +326,7 @@ namespace Xbox.Music
         }
 
         /// <summary>
-        /// 
+        /// Acquires a new AuthToken from Azure Access Control.
         /// </summary>
         /// <returns></returns>
         private async Task Authenticate()

@@ -70,6 +70,24 @@ namespace Xbox.Music.Tests
             //Assert.IsNotNull(result.Albums);
         }
 
+        [TestMethod]
+        public async Task GetTest2()
+        {
+            var client = new MusicClient("XboxMusicClientTests", "ThisWillBeChangedOften");
+            var ids = new List<string>
+            {
+                "music.C61C0000-0200-11DB-89CA-0019B92A3933",
+                "music.A83EB907-0100-11DB-89CA-0019B92A3933",
+                "music.B13EB907-0100-11DB-89CA-0019B92A3933"
+            };
+            var result = await client.Get(ids);
+            Assert.IsNotNull(result);
+            Assert.IsNull(result.Error);
+            Assert.IsNotNull(result.Artists);
+            Assert.IsNotNull(result.Tracks);
+            Assert.IsNotNull(result.Albums);
+        }
+
         //[TestMethod]
         //public async Task GetTest1Continued()
         //{

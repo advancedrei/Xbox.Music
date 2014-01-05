@@ -47,9 +47,9 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PortableRest, Version=2.2.0.0, Culture=neutral, PublicKeyToken=109c5b6afe0e5188, processorArchitecture=MSIL">
+    <Reference Include="PortableRest, Version=2.4.0.0, Culture=neutral, PublicKeyToken=109c5b6afe0e5188, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\PortableRest.2.2.3-alpha2\lib\portable-net45+sl5+wp8+win8\PortableRest.dll</HintPath>
+      <HintPath>..\packages\PortableRest.2.4.0\lib\portable-net45+sl5+wp8+win8\PortableRest.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net" />
