@@ -322,7 +322,6 @@ namespace Xbox.Music
                 Debug.WriteLine("Obtaining an AccessToken...");
                 await Authenticate();
             }
-
         }
 
         /// <summary>
