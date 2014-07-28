@@ -123,7 +123,7 @@ namespace Xbox.Music
 
             request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
 
-            return await ExecuteAsync<ContentResponse>(request);
+            return await ExecuteRequestAsync(request);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace Xbox.Music
             request.AddQueryString("continuationToken", continuationToken);
             request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
 
-            return await ExecuteAsync<ContentResponse>(request);
+            return await ExecuteRequestAsync(request);
         }
 
         #endregion
@@ -214,8 +214,8 @@ namespace Xbox.Music
             }
 
             request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
-            
-            return await ExecuteAsync<ContentResponse>(request);
+
+            return await ExecuteRequestAsync(request);
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace Xbox.Music
             request.AddQueryString("continuationToken", continuationToken);
             request.AddQueryString("accessToken", "Bearer " + TokenResponse.AccessToken);
 
-            return await ExecuteAsync<ContentResponse>(request);
+            return await ExecuteRequestAsync(request);
         }
 
         #endregion
@@ -269,60 +269,6 @@ namespace Xbox.Music
         #endregion
 
         #region Private Methods
-
-        /// <summary>
-        /// Gets a new <see cref="RestRequest"/> populated with the common values for every request.
-        /// </summary>
-        /// <param name="resourceUrl"></param>
-        /// <returns>A new <see cref="RestRequest"/> populated with the common values for every request</returns>
-        private RestRequest GetPopulatedRequest(string resourceUrl)
-        {
-            if (string.IsNullOrWhiteSpace(TokenResponse.AccessToken))
-            {
-                throw new Exception("The Xbox Music Client was unable to obtain an AccessToken from the authentication service.");
-            }
-
-            var request = new RestRequest(resourceUrl) { ContentType = ContentTypes.Json };
-
-            request.AddUrlSegment("namespace", "music");
-
-            if (!string.IsNullOrWhiteSpace(Language))
-            {
-                request.AddQueryString("language", Language);
-            }
-            if (!string.IsNullOrWhiteSpace(Country))
-            {
-                request.AddQueryString("country", Country);
-            }
-           
-            return request;
-        }
-
-        /// <summary>
-        /// Checks to see if the token needs to be acquired or refreshed. If the Token is null or invalid, 
-        /// it will block the calling method until the Token request completes. Otherwise it will be considered
-        /// a proactive refresh and get an updated token in the background.
-        /// </summary>
-        /// <returns></returns>
-        private async Task CheckToken()
-        {
-            if (TokenResponse != null && TokenResponse.NeedsRefresh)
-            {
-                // RWM: The token is still valid but within the 30 refresh window. 
-                // Get a new token, but to not block the existing request.
-                Debug.WriteLine("Proactively refreshing the AccessToken...");
-// ReSharper disable once CSharpWarnings::CS4014
-                Authenticate();
-            }
-
-            if (TokenResponse == null || !TokenResponse.IsValid)
-            {
-                // RWM: The token is invalid or outside the refresh window. 
-                // Get a new token, blocking the waiting request until the token has been acquired.
-                Debug.WriteLine("Obtaining an AccessToken...");
-                await Authenticate();
-            }
-        }
 
         /// <summary>
         /// Acquires a new AuthToken from Azure Access Control.
@@ -356,6 +302,85 @@ namespace Xbox.Music
             //var token = Regex.Match(result, ".*\"access_token\":\"(.*?)\".*", RegexOptions.IgnoreCase).Groups[1].Value;
             //AccessToken = token;
             //TokenLastAcquired = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Checks to see if the token needs to be acquired or refreshed. If the Token is null or invalid, 
+        /// it will block the calling method until the Token request completes. Otherwise it will be considered
+        /// a proactive refresh and get an updated token in the background.
+        /// </summary>
+        /// <returns></returns>
+        private async Task CheckToken()
+        {
+            if (TokenResponse != null && TokenResponse.NeedsRefresh)
+            {
+                // RWM: The token is still valid but within the 30 refresh window. 
+                // Get a new token, but to not block the existing request.
+                Debug.WriteLine("Proactively refreshing the AccessToken...");
+                // ReSharper disable once CSharpWarnings::CS4014
+                Authenticate();
+            }
+
+            if (TokenResponse == null || !TokenResponse.IsValid)
+            {
+                // RWM: The token is invalid or outside the refresh window. 
+                // Get a new token, blocking the waiting request until the token has been acquired.
+                Debug.WriteLine("Obtaining an AccessToken...");
+                await Authenticate();
+            }
+        }
+
+        /// <summary>
+        /// Executes the request and populates the ContentResponse with either the data from the service, or an Error.
+        /// </summary>
+        /// <param name="request">The RextRequest to execute.</param>
+        /// <returns>A ContentResponse object with the results from the service.</returns>
+        private async Task<ContentResponse> ExecuteRequestAsync(RestRequest request)
+        {
+            var result = await SendAsync<ContentResponse>(request);
+            if (result.HttpResponseMessage.IsSuccessStatusCode)
+            {
+                return result.Content;
+            }
+
+            return new ContentResponse
+            {
+                Error = new Error
+                {
+                    ErrorCode = result.HttpResponseMessage.StatusCode.ToString(),
+                    Message = result.HttpResponseMessage.ReasonPhrase,
+                    Response = result.HttpResponseMessage,
+                }
+            };
+
+        }
+
+        /// <summary>
+        /// Gets a new <see cref="RestRequest"/> populated with the common values for every request.
+        /// </summary>
+        /// <param name="resourceUrl"></param>
+        /// <returns>A new <see cref="RestRequest"/> populated with the common values for every request</returns>
+        private RestRequest GetPopulatedRequest(string resourceUrl)
+        {
+            if (string.IsNullOrWhiteSpace(TokenResponse.AccessToken))
+            {
+                throw new Exception("The Xbox Music Client was unable to obtain an AccessToken from the authentication service.");
+            }
+
+            var request = new RestRequest(resourceUrl) { ContentType = ContentTypes.Json };
+
+            request.AddUrlSegment("namespace", "music");
+
+            if (!string.IsNullOrWhiteSpace(Language))
+            {
+                request.AddQueryString("language", Language);
+            }
+            if (!string.IsNullOrWhiteSpace(Country))
+            {
+                request.AddQueryString("country", Country);
+            }
+           
+            return request;
         }
 
         #endregion

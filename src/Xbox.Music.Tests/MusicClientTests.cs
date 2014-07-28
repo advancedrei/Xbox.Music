@@ -58,6 +58,21 @@ namespace Xbox.Music.Tests
             Assert.IsNull(result.Albums);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task FindTest3()
+        {
+            var client = new MusicClient("XboxMusicClientTests", "ThisWillBeChangedOften");
+            var result = await client.Find("caparezza non me lo posso promettere");
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Error);
+            Assert.IsNotNull(result.Error.Response);
+            Assert.AreEqual("NotFound", result.Error.ErrorCode);
+        }
+
         [TestMethod]
         public async Task GetTest1()
         {

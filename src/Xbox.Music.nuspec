@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
     <metadata>
         <id>Xbox.Music</id>
-        <version>1.0.0</version>
+        <version>1.1.0-Beta1</version>
         <title>Xbox Music</title>
         <authors>AdvancedREI</authors>
         <owners>AdvancedREI</owners>
@@ -21,7 +21,7 @@ Beta 2: First working release.</releaseNotes>
         <copyright>Copyright © 2013-2014 AdvancedREI, LLC.</copyright>
         <tags>PortableRest, Xbox, Xbox Music, Windows Phone, PCL</tags>
         <dependencies>
-            <dependency id="PortableRest" version="2.4.1" />
+            <dependency id="PortableRest" version="3.0.0-RC7" />
         </dependencies>
     </metadata>
     <files>

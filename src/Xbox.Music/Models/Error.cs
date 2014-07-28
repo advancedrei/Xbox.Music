@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Net.Http;
+using System.Runtime.Serialization;
 
 namespace Xbox.Music
 {
@@ -25,6 +26,12 @@ namespace Xbox.Music
         /// </summary>
         [DataMember]
         public string Message { get; set; }
+
+        /// <summary>
+        /// The raw HTTP response from the service.
+        /// </summary>
+        [DataMember]
+        public HttpResponseMessage Response { get; set; }
 
     }
 }
