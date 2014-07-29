@@ -69,14 +69,14 @@ namespace Xbox.Music
         /// The album subtitle.
         /// </summary>
         [DataMember]
-        public List<string> Subtitle { get; set; }
+        public string Subtitle { get; set; }
 
-        /// <summary>
-        /// The list of distribution rights associated with this album in Xbox Music (for example, Stream, Purchase, and so on).
-        /// </summary>
-        [Obsolete("The Rights property appears to have been deprecated.", false)]
-        [DataMember]
-        public List<string> Rights { get; set; }
+        ///// <summary>
+        ///// The list of distribution rights associated with this album in Xbox Music (for example, Stream, Purchase, and so on).
+        ///// </summary>
+        //[Obsolete("The Rights property appears to have been deprecated.", false)]
+        //[DataMember]
+        //public List<string> Rights { get; set; }
 
         /// <summary>
         /// The list of contributors (artists and their roles) to the album.

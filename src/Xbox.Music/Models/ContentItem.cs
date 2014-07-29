@@ -15,7 +15,7 @@ namespace Xbox.Music
     /// Documentation found at http://msdn.microsoft.com/en-us/library/dn754096.aspx
     /// </remarks>
     [DataContract]
-    public class ContentItem
+    public class ContentItem : MusicItemBase
     {
 
         /// <summary>

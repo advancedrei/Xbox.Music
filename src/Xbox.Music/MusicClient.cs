@@ -338,7 +338,7 @@ namespace Xbox.Music
         private async Task<ContentResponse> ExecuteRequestAsync(RestRequest request)
         {
             var result = await SendAsync<ContentResponse>(request);
-            if (result.HttpResponseMessage.IsSuccessStatusCode)
+            if (result.HttpResponseMessage != null && result.HttpResponseMessage.IsSuccessStatusCode)
             {
                 return result.Content;
             }
@@ -347,8 +347,8 @@ namespace Xbox.Music
             {
                 Error = new Error
                 {
-                    ErrorCode = result.HttpResponseMessage.StatusCode.ToString(),
-                    Message = result.HttpResponseMessage.ReasonPhrase,
+                    ErrorCode = result.HttpResponseMessage != null ? result.HttpResponseMessage.StatusCode.ToString() : "",
+                    Message = result.HttpResponseMessage != null ? result.HttpResponseMessage.ReasonPhrase : result.SerializationException.Message,
                     Response = result.HttpResponseMessage,
                 }
             };

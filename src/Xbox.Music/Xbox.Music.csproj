@@ -38,6 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Models\Album.cs" />
+    <Compile Include="Models\MusicItemBase.cs" />
     <Compile Include="Models\Playlist.cs" />
     <Compile Include="Models\Artist.cs" />
     <Compile Include="Models\ContentResponse.cs" />
@@ -66,9 +67,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.2\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PortableRest">
-      <HintPath>..\packages\PortableRest.3.0.0-RC7\lib\portable-net45+sl5+wp8+win8+wpa81\PortableRest.dll</HintPath>
-    </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.27-beta\lib\portable-net40+sl4+win8+wp71+wpa81\System.Net.Http.dll</HintPath>
     </Reference>
@@ -81,6 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\PortableRest\src\PortableRest\PortableRest.csproj">
+      <Project>{a3546d1a-ce87-49bb-800a-98018c1fca00}</Project>
+      <Name>PortableRest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

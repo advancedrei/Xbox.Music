@@ -15,7 +15,7 @@ namespace Xbox.Music
     /// Documentation found at http://msdn.microsoft.com/en-us/library/dn546684.aspx
     /// </remarks>
     [DataContract]
-    public class PaginatedList<T> where T: EntryBase
+    public class PaginatedList<T> where T: MusicItemBase
     {
 
         /// <summary>

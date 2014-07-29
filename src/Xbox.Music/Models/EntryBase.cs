@@ -11,8 +11,9 @@ namespace Xbox.Music
     [KnownType(typeof(Album))]
     [KnownType(typeof(Artist))]
     [KnownType(typeof(Track))]
+    [KnownType(typeof(MusicItemBase))]
     [DataContract]
-    public class EntryBase
+    public class EntryBase : MusicItemBase
     {
 
         #region Properties
