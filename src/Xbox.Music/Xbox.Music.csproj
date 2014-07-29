@@ -38,12 +38,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Models\Album.cs" />
+    <Compile Include="Models\Playlist.cs" />
     <Compile Include="Models\Artist.cs" />
     <Compile Include="Models\ContentResponse.cs" />
     <Compile Include="Models\EntryBase.cs" />
     <Compile Include="Models\Error.cs" />
     <Compile Include="Models\ImageResizeMode.cs" />
     <Compile Include="Models\LookupOptions.cs" />
+    <Compile Include="Models\ContentItem.cs" />
+    <Compile Include="Models\TrackAction.cs" />
+    <Compile Include="Models\PlaylistAction.cs" />
     <Compile Include="Models\TokenResponse.cs" />
     <Compile Include="Models\LinkAction.cs" />
     <Compile Include="MusicClient.cs" />

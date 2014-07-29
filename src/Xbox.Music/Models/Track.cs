@@ -8,6 +8,7 @@ namespace Xbox.Music
     /// <summary>
     /// An individual piece of musical content from an <see cref="Album"/>. 
     /// </summary>
+    /// Documentation found at http://msdn.microsoft.com/en-us/library/dn546685.aspx
     [DataContract]
     public class Track : EntryBase
     {
@@ -19,7 +20,7 @@ namespace Xbox.Music
         /// </summary>
         [DataMember]
         public TimeSpan? Duration { get; set; }
-        
+
         /// <summary>
         /// Nullable. The position of the track in the album.
         /// </summary>
@@ -43,6 +44,12 @@ namespace Xbox.Music
         /// </summary>
         [DataMember]
         public List<string> Rights { get; set; }
+
+        /// <summary>
+        /// The track's subtitle.
+        /// </summary>
+        [DataMember]
+        public string Subtitle { get; set; }
 
         /// <summary>
         /// The album this track belongs to.

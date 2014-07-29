@@ -51,7 +51,7 @@ namespace Xbox.Music
         public Dictionary<string, string> OtherIds { get; set; }
 
         /// <summary>
-        /// An indication of the data source for this piece of content. Currently only "Catalog" is supported.
+        /// An indication of the data source for this piece of content. Possible values are Collection and Catalog.
         /// </summary>
         [DataMember]
         public string Source { get; set; }

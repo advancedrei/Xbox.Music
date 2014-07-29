@@ -4,6 +4,12 @@ using System.Runtime.Serialization;
 namespace Xbox.Music
 {
 
+    /// <summary>
+    /// Describes errors across all Xbox Music APIs.
+    /// </summary>
+    /// <remarks>
+    /// Documentation found at http://msdn.microsoft.com/en-us/library/dn546683.aspx
+    /// </remarks>
     [DataContract]
     public class Error
     {

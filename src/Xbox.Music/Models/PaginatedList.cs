@@ -11,6 +11,9 @@ namespace Xbox.Music
     /// tokens are returned in a PaginatedList object. 
     /// </summary>
     /// <typeparam name="T">The type of item (inheriting from EntryBase) that comprises the List.</typeparam>
+    /// <remarks>
+    /// Documentation found at http://msdn.microsoft.com/en-us/library/dn546684.aspx
+    /// </remarks>
     [DataContract]
     public class PaginatedList<T> where T: EntryBase
     {
@@ -35,6 +38,12 @@ namespace Xbox.Music
         /// </remarks>
         [DataMember]
         public string ContinuationToken { get; set; }
+
+        /// <summary>
+        /// An estimated count of the total number of items available in the list. 
+        /// </summary>
+        [DataMember]
+        public int TotalItemCount { get; set; }
 
     }
 }

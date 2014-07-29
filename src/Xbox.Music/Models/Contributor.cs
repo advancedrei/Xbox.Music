@@ -6,6 +6,9 @@ namespace Xbox.Music
     /// <summary>
     /// An individual or group who contributed work to an <see cref="Album"/> or <see cref="Track"/>.
     /// </summary>
+    /// <remarks>
+    /// Documentation found at http://msdn.microsoft.com/en-us/library/dn546682.aspx
+    /// </remarks>
     [DataContract]
     public class Contributor
     {

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Xbox.Music
 {
 
     /// <summary>
-    /// 
+    /// The creator or creators of a musical recording. 
     /// </summary>
+    /// <remarks>
+    /// Documentation found at http://msdn.microsoft.com/en-us/library/dn546680.aspx
+    /// </remarks>
     [DataContract]
     public class Artist : EntryBase
     {
@@ -19,6 +21,12 @@ namespace Xbox.Music
         /// </summary>
         [DataMember]
         public List<string> Genres { get; set; }
+
+        /// <summary>
+        /// A list of musical sub-genres associated with the artist.
+        /// </summary>
+        [DataMember]
+        public List<string> Subgenres { get; set; }
 
         /// <summary>
         /// An optional paginated list of related artists. 
