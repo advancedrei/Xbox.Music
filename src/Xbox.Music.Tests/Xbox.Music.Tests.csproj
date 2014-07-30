@@ -52,6 +52,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PortableRest, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\PortableRest.3.0.0-RC7\lib\portable-net45+sl5+wp8+win8+wpa81\PortableRest.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
@@ -82,10 +86,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\PortableRest\src\PortableRest\PortableRest.csproj">
-      <Project>{a3546d1a-ce87-49bb-800a-98018c1fca00}</Project>
-      <Name>PortableRest</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Xbox.Music\Xbox.Music.csproj">
       <Project>{53203a30-e4ce-4b7e-ae31-a46b8c7cc142}</Project>
       <Name>Xbox.Music</Name>
